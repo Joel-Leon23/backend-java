@@ -3,6 +3,7 @@ package com.springboot.backend.app.computers.models.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +17,7 @@ public class ComputerServiceImpl implements ComputerService {
 	private ComputerDao dao;
 	@Override
 	@Transactional(readOnly = true)
-	public List<Computer> finAll() {
+	public List<Computer> findAll() {
 		return (List<Computer>) dao.findAll();
 	}
 
@@ -34,17 +35,16 @@ public class ComputerServiceImpl implements ComputerService {
 
 	@Override
 	@Transactional
-	public void update(Long id, Computer computer) {
+	public Computer update(Long id, Computer computer) {
 		Computer existingComputer = dao.findById(id).orElse(null);
 	    if (existingComputer != null) {
-	        // Update the existing computer with the new data
 	    	existingComputer.setProcessor(computer.getProcessor());
 	        existingComputer.setGraphicsCard(computer.getGraphicsCard());
 	        existingComputer.setRamGB(computer.getRamGB());
-	        // Set other properties as needed
 	        // Save the updated computer
-	        dao.save(existingComputer);
+	        return dao.save(existingComputer);
 	    }
+		return null;
 	}
 
 	@Override

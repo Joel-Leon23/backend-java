@@ -3,6 +3,8 @@ package com.springboot.backend.app.computers.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,28 +25,42 @@ public class ComputerController {
 	private ComputerService microService;
 	
 	@GetMapping
-	public List<Computer> list() {
-		return microService.finAll();
+	public ResponseEntity<List<Computer>> list() {
+		return new ResponseEntity<>(microService.findAll(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/{id}")
-	public Computer detail(@PathVariable Long id) {
-		return microService.findById(id);
+	public ResponseEntity<Computer> detail(@PathVariable Long id) {
+		return new ResponseEntity<>(microService.findById(id), HttpStatus.OK);
 	}
 	
 	@PostMapping(consumes="application/json", produces="application/json")
-	public Computer create(@RequestBody Computer computer) {
-		return microService.create(computer);
+	public ResponseEntity<Computer> create(@RequestBody Computer computer) {
+		try {
+            microService.create(computer);
+            return new ResponseEntity<>(computer, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 	}
 	
 	@PutMapping("/{id}")
-	public void update(@PathVariable Long id, @RequestBody Computer computer) {
-		microService.update(id, computer);
+	public ResponseEntity<Computer> update(@PathVariable Long id, @RequestBody Computer computer) {
+		Computer updatedComputer = microService.update(id, computer); 
+		if (updatedComputer != null) {
+			return new ResponseEntity<>(updatedComputer, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
 	@DeleteMapping("/{id}")
-	public void delete(@PathVariable Long id) {
-		microService.delete(id);
+	public ResponseEntity<Computer> delete(@PathVariable Long id) {
+		try {
+            microService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 	}
 
 }
